@@ -11,16 +11,14 @@
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring-boot.version>2.7.1</spring-boot.version>
+        <spring-boot.version>2.6.13</spring-boot.version>
     </properties>
-
     <dependencies>
         <!--web依赖:tomcat, dispatcherServlet, xml...-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
         <!--单元测试-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -28,51 +26,51 @@
             <scope>test</scope>
         </dependency>
 
-        <!--MyBatis-->
-<!--        <dependency>
+        <!--Mybatis-->
+        <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>3.5.1</version>
-        </dependency>-->
+            <version>3.4.2</version>
+        </dependency>
 
-        <!--省略getter、setter、equals-->
+        <!--Getter Setter Equals省略-->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.20</version>
         </dependency>
 
-        <!--对象转Json-->
+        <!--类转Json-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>1.2.76</version>
         </dependency>
 
-        <!--commons-lang是Apache Commons项目中的一个Java工具库，
-        它提供了一系列实用的工具类和方法，用于简化和增强Java编程中常见的任务。
-        主要关注文本处理、日期操作、数学计算、系统属性、反射、字符串操作等方面的功能-->
+        <!--常用工具类-->
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
-            <version>2.4</version>
+            <version>2.6</version>
         </dependency>
 
-        <!--MySql驱动包-->
-<!--        <dependency>
+        <!--MySql驱动-->
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <scope>runtime</scope>
-        </dependency>-->
+        </dependency>
 
-        <!--数据库连接池-->
-<!--        <dependency>
+        <!--数据库连接池
+        数据库连接池是程序启动时建立足够的数据库连接，并将这些连接组成一个连接池，
+        由程序动态地对池中的连接进行申请，使用，释放-->
+        <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-starter</artifactId>
-            <version>1.2.14</version>
-        </dependency>-->
-    </dependencies>
+            <version>1.1.10</version>
+        </dependency>
 
+    </dependencies>
     <dependencyManagement>
         <dependencies>
             <dependency>
