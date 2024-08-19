@@ -23,7 +23,7 @@ class GameServerApplicationTests {
         globalConfig.setOutputDir(System.getProperty("user.dir") + "/src/main/java") // 设置输出目录
                 .setAuthor("zhang-wei") // 设置作者
                 .setOpen(false) // 设置生成后是否自动打开目录
-                .setFileOverride(true) // 设置文件存在时是否覆盖
+                .setFileOverride(false) // 设置文件存在时是否覆盖
                 .setServiceName("%sService") // 设置Service接口名后缀
                 .setIdType(IdType.AUTO); // 设置主键生成策略
                 //.setSwagger2(true); // 设置是否生成Swagger注解
