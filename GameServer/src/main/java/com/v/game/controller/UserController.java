@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.v.game.common.R;
 import com.v.game.entity.User;
+import com.v.game.entity.Vip;
 import com.v.game.service.UserService;
+import com.v.game.service.VipService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -22,7 +25,10 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private VipService vipService;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
     
     /**
      * 用户注册
@@ -68,7 +74,10 @@ public class UserController {
         }
 
         //登录成功，将员工id存入Session并返回登录成功结果
-        request.getSession().setAttribute("user", user.getId());
+        //request.getSession().setAttribute("user", user.getId());
+
+        //登录成功，将员工id缓存到redis中
+        redisTemplate.opsForValue().set("user", userData.getId());
 
         return R.success(userData);
     }
@@ -78,7 +87,10 @@ public class UserController {
      */
     @PostMapping("/logout")
     private R<String> logout(HttpServletRequest request) {
-        request.getSession().removeAttribute("user");
+        //request.getSession().removeAttribute("user");
+        //从redis中移除key
+        redisTemplate.delete("user");
+
         return R.success("退出成功");
     }
 
@@ -101,5 +113,12 @@ public class UserController {
         userService.page(pageInfo,queryWrapper);
 
         return R.success(pageInfo);
+    }
+
+    @GetMapping("/vip")
+    private R<List<Vip>> getAllVips()
+    {
+        List<Vip> list = vipService.list();
+        return R.success(list);
     }
 }
