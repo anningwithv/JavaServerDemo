@@ -1,15 +1,25 @@
 package com.v.game.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-/*
- 用户实体类
+/**
+ * <p>
+ *
+ * </p>
+ *
+ * @author zhang-wei
+ * @since 2024-08-19
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class User implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private Long id;
     private String name;
     private String password;
