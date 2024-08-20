@@ -96,6 +96,13 @@
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
 
+        <!--Swagger依赖，自动API生成-->
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring-boot-starter</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+
     </dependencies>
     <dependencyManagement>
         <dependencies>
