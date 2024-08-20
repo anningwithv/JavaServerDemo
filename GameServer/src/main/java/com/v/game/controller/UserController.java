@@ -113,5 +113,13 @@ public class UserController {
         return R.success(pageInfo);
     }
 
-
+    /**
+     * @PathVariable映射url绑定的占位符
+     */
+    @GetMapping("/get/{id}")
+    public R<User> getById(@PathVariable Long id)
+    {
+        User user = userService.getById(id);
+        return R.success(user);
+    }
 }
