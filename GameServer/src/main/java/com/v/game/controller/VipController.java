@@ -10,6 +10,7 @@ import com.v.game.service.UserService;
 import com.v.game.service.VipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,20 +40,21 @@ public class VipController {
 
     private final String redisVipListKey = "vipList";
 
+    @Cacheable(value = "allVipCache", key = "#root.methodName")
     @GetMapping("/get")
     public R<List<Vip>> getAllVips()
     {
         //先从redis中查询数据，如果存在则直接返回
-        List<Vip> vip = (List<Vip>) redisTemplate.opsForValue().get(redisVipListKey);
-        if(vip != null)
-        {
-            return R.success(vip);
-        }
+//        List<Vip> vip = (List<Vip>) redisTemplate.opsForValue().get(redisVipListKey);
+//        if(vip != null)
+//        {
+//            return R.success(vip);
+//        }
 
         List<Vip> list = vipService.list();
 
         //查询到的数据缓存到redis，方便后面直接使用
-        redisTemplate.opsForValue().set(redisVipListKey,list, 60, TimeUnit.MINUTES);
+        //redisTemplate.opsForValue().set(redisVipListKey,list, 60, TimeUnit.MINUTES);
 
         return R.success(list);
     }
@@ -81,7 +83,7 @@ public class VipController {
         vipService.saveOrUpdate(vip, vipUpdateWrapper);
 
         //vip数据更新了，需要清除redis缓存
-        redisTemplate.delete(redisVipListKey);
+        //redisTemplate.delete(redisVipListKey);
 
         return R.success(vip);
     }
