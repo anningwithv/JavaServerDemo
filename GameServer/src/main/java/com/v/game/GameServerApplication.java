@@ -10,7 +10,6 @@ import org.springframework.cache.annotation.EnableCaching;
 @EnableCaching
 @SpringBootApplication
 public class GameServerApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(GameServerApplication.class, args);
         log.info("----Run successfully----");

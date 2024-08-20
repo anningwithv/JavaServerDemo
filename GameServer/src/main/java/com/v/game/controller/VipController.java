@@ -9,6 +9,7 @@ import com.v.game.entity.Vip;
 import com.v.game.service.UserService;
 import com.v.game.service.VipService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +40,7 @@ public class VipController {
     private final String redisVipListKey = "vipList";
 
     @GetMapping("/get")
-    private R<List<Vip>> getAllVips()
+    public R<List<Vip>> getAllVips()
     {
         //先从redis中查询数据，如果存在则直接返回
         List<Vip> vip = (List<Vip>) redisTemplate.opsForValue().get(redisVipListKey);
@@ -56,8 +57,12 @@ public class VipController {
         return R.success(list);
     }
 
+    /**
+     * CachePut:将方法返回值放入缓存 value:缓存名称，key:缓存key(可以有多个key)
+     */
+    @CachePut(value = "vipCache", key = "#result.data.id", condition = "#result.data.id != null")
     @PostMapping("/add")
-    private R<String> AddVip(@RequestBody User user, @RequestParam int level)
+    public R<Vip> AddVip(@RequestBody User user, @RequestParam int level)
     {
         //查询用户是否存在
         LambdaQueryWrapper<User> userQueryWrapper = new LambdaQueryWrapper<>();
@@ -78,7 +83,7 @@ public class VipController {
         //vip数据更新了，需要清除redis缓存
         redisTemplate.delete(redisVipListKey);
 
-        return R.success("添加vip成功");
+        return R.success(vip);
     }
 }
 
