@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RestController
@@ -23,9 +24,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private VipService vipService;
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -115,10 +113,5 @@ public class UserController {
         return R.success(pageInfo);
     }
 
-    @GetMapping("/vip")
-    private R<List<Vip>> getAllVips()
-    {
-        List<Vip> list = vipService.list();
-        return R.success(list);
-    }
+
 }
