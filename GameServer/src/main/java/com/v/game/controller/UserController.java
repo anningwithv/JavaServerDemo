@@ -7,6 +7,10 @@ import com.v.game.entity.User;
 import com.v.game.entity.Vip;
 import com.v.game.service.UserService;
 import com.v.game.service.VipService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @RestController
 @RequestMapping("/user")
+@Api(tags = "用户相关请求")
 public class UserController {
 
     @Autowired
@@ -31,6 +36,7 @@ public class UserController {
     /**
      * 用户注册
      */
+    @ApiOperation("用户注册")
     @PostMapping("/register")
     private R<User> register(@RequestBody User user) {
         //查询用户名是否已经存在
@@ -54,6 +60,7 @@ public class UserController {
      *
      * @RequestBody 用来接收请求协议中的body-json数据
      */
+    @ApiOperation("用户登录")
     @PostMapping("/login")
     private R<User> login(HttpServletRequest request, @RequestBody User user) {
         String password = user.getPassword();
@@ -83,6 +90,7 @@ public class UserController {
     /**
      * 用户退出登录
      */
+    @ApiOperation("用户登出")
     @PostMapping("/logout")
     private R<String> logout(HttpServletRequest request) {
         //request.getSession().removeAttribute("user");
@@ -93,6 +101,11 @@ public class UserController {
     }
 
     @GetMapping("/search")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "页码", required = true),
+            @ApiImplicitParam(name = "pageSize", value = "每页条数", required = true),
+            @ApiImplicitParam(name = "name", value = "用户名", required = false)
+    })
     private R<Page> search(Integer page, Integer pageSize, String name)
     {
         //构造分页构造器
@@ -116,6 +129,7 @@ public class UserController {
     /**
      * @PathVariable映射url绑定的占位符
      */
+    @ApiOperation("根据id查找用户")
     @GetMapping("/get/{id}")
     public R<User> getById(@PathVariable Long id)
     {

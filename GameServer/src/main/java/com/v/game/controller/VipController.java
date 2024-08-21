@@ -8,6 +8,8 @@ import com.v.game.entity.User;
 import com.v.game.entity.Vip;
 import com.v.game.service.UserService;
 import com.v.game.service.VipService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,6 +29,7 @@ import java.util.concurrent.TimeUnit;
  */
 @RestController
 @RequestMapping("/vip")
+@Api(tags = "付费用户相关请求")
 public class VipController {
 
     @Autowired
@@ -40,6 +43,7 @@ public class VipController {
 
     private final String redisVipListKey = "vipList";
 
+    @ApiOperation("获取所有付费用户")
     @Cacheable(value = "allVipCache", key = "#root.methodName")
     @GetMapping("/get")
     public R<List<Vip>> getAllVips()
@@ -62,6 +66,7 @@ public class VipController {
     /**
      * CachePut:将方法返回值放入缓存 value:缓存名称，key:缓存key(可以有多个key)
      */
+    @ApiOperation("添加付费用户")
     @CachePut(value = "vipCache", key = "#result.data.id", condition = "#result.data.id != null")
     @PostMapping("/add")
     public R<Vip> AddVip(@RequestBody User user, @RequestParam int level)

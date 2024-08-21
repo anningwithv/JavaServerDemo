@@ -48,10 +48,11 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         log.info("开始进行静态资源映射...");
+        //接口文档静态资源
         registry.addResourceHandler("doc.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
-        registry.addResourceHandler("/backend/**").addResourceLocations("classpath:/backend/");
-        registry.addResourceHandler("/front/**").addResourceLocations("classpath:/front/");
+        //registry.addResourceHandler("/backend/**").addResourceLocations("classpath:/backend/");
+        //registry.addResourceHandler("/front/**").addResourceLocations("classpath:/front/");
     }
 
     /**
@@ -69,6 +70,10 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
 //        converters.add(0,messageConverter);
     }
 
+    /**
+     * 设置接口文档信息
+     * @return
+     */
     @Bean
     public Docket createRestApi() {
         // 文档类型
