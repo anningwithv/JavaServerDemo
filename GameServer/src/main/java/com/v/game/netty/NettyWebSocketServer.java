@@ -6,9 +6,17 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.timeout.IdleStateHandler;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.TimeUnit;
+
+@Slf4j
 public class NettyWebSocketServer {
 
     private final int port;
@@ -39,19 +47,30 @@ public class NettyWebSocketServer {
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
                             //给pipeline管道设置处理器
                             ChannelPipeline p = socketChannel.pipeline();
+                            //对http协议的支持，使用http的编码器，解码器
                             p.addLast(new HttpServerCodec());
+                            //保证接收的http请求的完整性
                             p.addLast(new HttpObjectAggregator(65536));
+                            //将http协议升级为ws协议，对websocket的支持
                             p.addLast(new WebSocketServerProtocolHandler("/websocket"));
-                            p.addLast(new WebSocketServerHandler());
+                            //ws连接、消息手法处理
+                            p.addLast(new HandlerWebSocketServer());
+                            //定义超时规则
+                            p.addLast(new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS));
+                            //心跳超时处理
+                            p.addLast(new HearBeatHandler());
+                            p.addLast("decoder", new StringDecoder());
+                            p.addLast("encoder", new StringEncoder());
                         }
                     });//给workerGroup的EventLoop对应的管道设置处理器
-            System.out.println("Netty服务端已经准备就绪...");
+            log.info("Netty服务端已经准备就绪...");
             //绑定端口号，启动服务端
             ChannelFuture channelFuture = bootstrap.bind(port).sync();
             //对关闭通道进行监听
             channelFuture.channel().closeFuture().sync();
         }
         catch (Exception exception) {
+            log.info("启动netty失败");
             throw new RuntimeException(exception);
         }
         finally {
