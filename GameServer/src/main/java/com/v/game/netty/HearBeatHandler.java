@@ -6,8 +6,10 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
+@Component
 public class HearBeatHandler extends ChannelInboundHandlerAdapter {
 
     private int lossConnectCount = 0;

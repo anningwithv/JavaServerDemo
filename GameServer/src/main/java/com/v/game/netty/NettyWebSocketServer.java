@@ -1,5 +1,6 @@
 package com.v.game.netty;
 
+import com.v.game.config.AppConfig;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -13,23 +14,39 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PreDestroy;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
+@Component
 public class NettyWebSocketServer {
 
-    private final int port;
+    private static EventLoopGroup bossGroup;
+    private static EventLoopGroup workerGroup;
 
-    public NettyWebSocketServer(int port) {
-        this.port = port;
+    @Autowired
+    private AppConfig appConfig;
+
+    @Autowired
+    private HearBeatHandler heartBeatHandler;
+
+    @Autowired
+    private HandlerWebSocketServer handlerWebSocketServer;
+
+    public NettyWebSocketServer() {
+
     }
 
+    @Async
     public void run() throws Exception
     {
         //创建两个线程组 bossGroup、workerGroup
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        bossGroup = new NioEventLoopGroup();
+        workerGroup = new NioEventLoopGroup();
         try {
             //创建服务端的启动对象，设置参数
             ServerBootstrap bootstrap = new ServerBootstrap();
@@ -52,20 +69,20 @@ public class NettyWebSocketServer {
                             //保证接收的http请求的完整性
                             p.addLast(new HttpObjectAggregator(65536));
                             //将http协议升级为ws协议，对websocket的支持
-                            p.addLast(new WebSocketServerProtocolHandler("/websocket"));
+                            p.addLast(new WebSocketServerProtocolHandler("/websocket", null, true, 65536, true, true, 10000L));
                             //ws连接、消息手法处理
-                            p.addLast(new HandlerWebSocketServer());
+                            p.addLast(handlerWebSocketServer);
                             //定义超时规则
                             p.addLast(new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS));
                             //心跳超时处理
-                            p.addLast(new HearBeatHandler());
+                            p.addLast(heartBeatHandler);
                             p.addLast("decoder", new StringDecoder());
                             p.addLast("encoder", new StringEncoder());
                         }
                     });//给workerGroup的EventLoop对应的管道设置处理器
             log.info("Netty服务端已经准备就绪...");
             //绑定端口号，启动服务端
-            ChannelFuture channelFuture = bootstrap.bind(port).sync();
+            ChannelFuture channelFuture = bootstrap.bind(appConfig.getNettyPort()).sync();
             //对关闭通道进行监听
             channelFuture.channel().closeFuture().sync();
         }
@@ -78,16 +95,22 @@ public class NettyWebSocketServer {
             workerGroup.shutdownGracefully();
         }
     }
-    public static void main(String[] args) {
-        int port = 9090;
-        if (args.length > 0) {
-            port = Integer.parseInt(args[0]);
-        }
 
-        try {
-            new NettyWebSocketServer(port).run();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    @PreDestroy
+    public void close(){
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
     }
+//    public static void main(String[] args) {
+//        int port = 9090;
+//        if (args.length > 0) {
+//            port = Integer.parseInt(args[0]);
+//        }
+//
+//        try {
+//            new NettyWebSocketServer(port).run();
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 }
